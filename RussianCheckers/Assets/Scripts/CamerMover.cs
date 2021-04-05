@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class CamerMover : MonoBehaviour
 {
-    public float rotationSpeed;
+    private void Start()
+    {
+        transform.position = new Vector3(3.5f, 0, 3.5f);
+    }
     void Update()
     {
-        float horizontalInput = -Input.GetAxis("Horizontal");
-        float verticallInput = Input.GetAxis("Vertical");
-
-        transform.eulerAngles = transform.eulerAngles + new Vector3(verticallInput, horizontalInput, 0);
+        transform.eulerAngles += new Vector3(Input.GetAxis("Vertical"), -Input.GetAxis("Horizontal"), 0);
     }
 }

@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 1415081854818664310}
   - component: {fileID: 2597656583477276883}
   - component: {fileID: 281560393821635609}
-  - component: {fileID: -3331417535487026159}
+  - component: {fileID: 8879183027413681230}
+  - component: {fileID: 5481765680175357586}
   m_Layer: 0
   m_Name: BlackPiece
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1794880025227519436}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0.14, z: 0}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
@@ -82,7 +83,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-3331417535487026159
+--- !u!114 &8879183027413681230
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,5 +95,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9057deb8a7d5da498f56c524e81387f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isWhite: 0
-  isKing: 0
+  Data:
+    position: {x: 0, y: 0}
+    isWhite: 0
+    isKing: 0
+--- !u!64 &5481765680175357586
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794880025227519436}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -4146098134866999730, guid: da3f1540b68218f42b2bc2918e6240d3, type: 3}

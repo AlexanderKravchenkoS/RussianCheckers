@@ -1,0 +1,198 @@
+{
+
+  "checkersData": [
+    {
+      "position": {
+        "x": 6.0,
+        "y": 2.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 1.0,
+        "y": 5.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 4.0,
+        "y": 2.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 3.0,
+        "y": 5.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 5.0,
+        "y": 5.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 7.0,
+        "y": 5.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 7.0,
+        "y": 1.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 0.0,
+        "y": 6.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 5.0,
+        "y": 1.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 2.0,
+        "y": 6.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 3.0,
+        "y": 1.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 4.0,
+        "y": 6.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 6.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 0.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 1.0,
+        "y": 7.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 4.0,
+        "y": 0.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 3.0,
+        "y": 7.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 5.0,
+        "y": 7.0
+      },
+      "isWhite": false,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "isWhite": true,
+      "isKing": false
+    },
+    {
+      "position": {
+        "x": 7.0,
+        "y": 7.0
+      },
+      "isWhite": false,
+      "isKing": false
+    }
+  ],
+  "isWhiteTurn":  true
+}
