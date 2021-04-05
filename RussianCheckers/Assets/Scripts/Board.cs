@@ -40,7 +40,12 @@ public class Board : MonoBehaviour
                 if (Input.GetMouseButtonUp(0))
                 {
                     Vector2Int originPosition = selectedChecker.Data.position;
-                    if (mouseDownPosition.x < 0 || mouseDownPosition.x > 7 || mouseDownPosition.y < 0 || mouseDownPosition.y > 7 || originPosition == mouseDownPosition)
+                    if (mouseDownPosition.x < 0 || mouseDownPosition.x > 7 || mouseDownPosition.y < 0 || mouseDownPosition.y > 7)
+                    {
+                        selectedChecker.transform.position = new Vector3(originPosition.x, 0, originPosition.y);
+                        selectedChecker = null;
+                        return;
+                    }if (originPosition == mouseDownPosition || !IsCorrectMove(mouseDownPosition))
                     {
                         selectedChecker.transform.position = new Vector3(originPosition.x, 0, originPosition.y);
                         selectedChecker = null;
@@ -48,11 +53,84 @@ public class Board : MonoBehaviour
                     }
                     selectedChecker.Data.position = mouseDownPosition;
                     selectedChecker.transform.position = new Vector3(mouseDownPosition.x, 0, mouseDownPosition.y);
+                    if ((selectedChecker.transform.position.z == 7 && selectedChecker.Data.isWhite) || (selectedChecker.transform.position.z == 0 && !selectedChecker.Data.isWhite))
+                    {
+                        selectedChecker.MakeKing();
+                    }
                     selectedChecker = null;
                     isWhiteTurn = !isWhiteTurn;
                 }
             }
         }
+    }
+    private bool IsCorrectMove(Vector2Int mouseDownPosition)
+    {
+        Vector2Int vector2Int = (mouseDownPosition - selectedChecker.Data.position);
+        if (Mathf.Abs(vector2Int.x) == Mathf.Abs(vector2Int.y))
+        {
+            Checker[] checkers = FindObjectsOfType<Checker>().ToArray();
+            List<Checker> checkersOnLine = new List<Checker>();
+            int deltaX = mouseDownPosition.x > selectedChecker.Data.position.x ? 1 : -1;
+            int deltaZ = mouseDownPosition.y > selectedChecker.Data.position.y ? 1 : -1;
+            int z = selectedChecker.Data.position.y + deltaZ;
+            for (int x = selectedChecker.Data.position.x + deltaX; x != mouseDownPosition.x; x += deltaX)
+            {
+                if (checkers.Where(checker => checker.Data.position.x == x && checker.Data.position.y == z).FirstOrDefault() != null)
+                {
+                    checkersOnLine.Add(checkers.Where(checker => checker.Data.position.x == x && checker.Data.position.y == z).First());
+                }
+                z += deltaZ;
+            }
+            Checker checker = checkersOnLine
+                        .Where(checker => checker.transform.position == new Vector3(mouseDownPosition.x, 0, mouseDownPosition.y))
+                        .FirstOrDefault();
+            if (checker != null)
+            {
+                return false;
+            }
+            if (!selectedChecker.Data.isKing)
+            {
+                int colourMult = selectedChecker.Data.isWhite ? 1 : -1;
+                if (vector2Int.y == colourMult)
+                {
+                    return true;
+                }
+                if (Mathf.Abs(vector2Int.x) == 2)
+                {
+                    Vector2Int enemyPos = (mouseDownPosition + selectedChecker.Data.position) / 2;
+                    Checker enemy = checkersOnLine
+                        .Where(checker => 
+                            checker.transform.position == new Vector3(enemyPos.x, 0, enemyPos.y) && checker.Data.isWhite != selectedChecker.Data.isWhite)
+                        .FirstOrDefault();
+                    if (enemy != null)
+                    {
+                        if (enemy.Data.isKing)
+                        {
+                            selectedChecker.MakeKing();
+                        }
+                        Destroy(enemy.gameObject);
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (checkersOnLine.Where(checker => checker.Data.isWhite == selectedChecker.Data.isWhite).ToArray().Length == 0)
+                {
+                    Checker[] enemies = checkersOnLine.Where(checker => checker.Data.isWhite != selectedChecker.Data.isWhite).ToArray();
+                    if (enemies.Length == 0)
+                    {
+                        return true;
+                    }
+                    if (enemies.Length == 1)
+                    {
+                        Destroy(enemies[0].gameObject);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     private void AddChecker(CheckerData data)
     {
