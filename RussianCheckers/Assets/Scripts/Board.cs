@@ -11,6 +11,8 @@ public class Board : MonoBehaviour
     [SerializeField] GameObject BlackPrefab;
     private Checker selectedChecker;
     private bool isWhiteTurn;
+    private int whiteCheckers = 12;
+    private int blackCheckers = 12;
 
     void Start()
     {
@@ -57,6 +59,7 @@ public class Board : MonoBehaviour
                     {
                         selectedChecker.MakeKing();
                     }
+                    WinCheck();
                     selectedChecker = null;
                     isWhiteTurn = !isWhiteTurn;
                 }
@@ -108,6 +111,14 @@ public class Board : MonoBehaviour
                         {
                             selectedChecker.MakeKing();
                         }
+                        if (enemy.Data.isWhite == true)
+                        {
+                            whiteCheckers--;
+                        }
+                        else
+                        {
+                            blackCheckers--;
+                        }
                         Destroy(enemy.gameObject);
                         return true;
                     }
@@ -124,6 +135,14 @@ public class Board : MonoBehaviour
                     }
                     if (enemies.Length == 1)
                     {
+                        if (enemies[0].Data.isWhite == true)
+                        {
+                            whiteCheckers--;
+                        }
+                        else
+                        {
+                            blackCheckers--;
+                        }
                         Destroy(enemies[0].gameObject);
                         return true;
                     }
@@ -137,6 +156,14 @@ public class Board : MonoBehaviour
         GameObject checkerPrefab = data.isWhite ? WhitePrefab : BlackPrefab;
         var figureGameObject = Instantiate(checkerPrefab, new Vector3(data.position.x, 0, data.position.y), checkerPrefab.transform.rotation);
         figureGameObject.GetComponent<Checker>().Data = data;
+        if (data.isWhite)
+        {
+            whiteCheckers++;
+        }
+        else
+        {
+            blackCheckers++;
+        }
     }
     public void SaveBoard()
     {
@@ -157,7 +184,7 @@ public class Board : MonoBehaviour
         {
             Destroy(checker);
         }
-
+        whiteCheckers = blackCheckers = 0;
         string path = isNewGame ? "newGame.json" : "previousGame.json";
         string fullPath = Path.Combine(Application.dataPath, path);
         using (StreamReader reader = new StreamReader(fullPath))
@@ -167,6 +194,17 @@ public class Board : MonoBehaviour
             isWhiteTurn = boardState.isWhiteTurn;
             for (int i = 0; i < boardState.checkersData.Length; i++)
                 AddChecker(boardState.checkersData[i]);
+        }
+    }
+    private void WinCheck()
+    {
+        if (blackCheckers == 0)
+        {
+            Debug.Log("White WIN");
+        }
+        if (whiteCheckers == 0)
+        {
+            Debug.Log("Black WIN");
         }
     }
 }
