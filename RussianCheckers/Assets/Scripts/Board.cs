@@ -9,10 +9,10 @@ public class Board : MonoBehaviour
 {
     [SerializeField] GameObject WhitePrefab;
     [SerializeField] GameObject BlackPrefab;
+    List<Checker> allCheckers = new List<Checker>();
+    List<Checker> beatCheckers = new List<Checker>();
     private Checker selectedChecker;
     private bool isWhiteTurn;
-    private int whiteCheckers = 12;
-    private int blackCheckers = 12;
 
     void Start()
     {
@@ -32,8 +32,12 @@ public class Board : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 var checker = hit.transform.gameObject.GetComponent<Checker>();
-                if (checker != null && checker.Data.isWhite == isWhiteTurn)
+                if (checker != null && checker.Data.isWhite == isWhiteTurn && beatCheckers.Count == 0) 
                     selectedChecker = checker;
+                else if (checker != null && checker.Data.isWhite == isWhiteTurn && beatCheckers.Contains(checker))
+                {
+                    selectedChecker = checker;
+                }
             }
             if (selectedChecker != null)
             {
@@ -59,9 +63,15 @@ public class Board : MonoBehaviour
                     {
                         selectedChecker.MakeKing();
                     }
-                    WinCheck();
-                    selectedChecker = null;
-                    isWhiteTurn = !isWhiteTurn;
+                    beatCheckers = new List<Checker>();
+                    beatCheckers.AddRange(BeatMoves(selectedChecker));
+                    if (beatCheckers.Count == 0)
+                    {
+                        selectedChecker = null;
+                        isWhiteTurn = !isWhiteTurn;
+                        beatCheckers = new List<Checker>();
+                        beatCheckers.AddRange(BeatMoves());
+                    }
                 }
             }
         }
@@ -71,21 +81,20 @@ public class Board : MonoBehaviour
         Vector2Int vector2Int = (mouseDownPosition - selectedChecker.Data.position);
         if (Mathf.Abs(vector2Int.x) == Mathf.Abs(vector2Int.y))
         {
-            Checker[] checkers = FindObjectsOfType<Checker>().ToArray();
             List<Checker> checkersOnLine = new List<Checker>();
             int deltaX = mouseDownPosition.x > selectedChecker.Data.position.x ? 1 : -1;
             int deltaZ = mouseDownPosition.y > selectedChecker.Data.position.y ? 1 : -1;
             int z = selectedChecker.Data.position.y + deltaZ;
-            for (int x = selectedChecker.Data.position.x + deltaX; x != mouseDownPosition.x; x += deltaX)
+            for (int x = selectedChecker.Data.position.x + deltaX; x != mouseDownPosition.x + deltaX; x += deltaX)
             {
-                if (checkers.Where(checker => checker.Data.position.x == x && checker.Data.position.y == z).FirstOrDefault() != null)
+                if (allCheckers.Where(checker => checker.Data.position.x == x && checker.Data.position.y == z).FirstOrDefault() != null)
                 {
-                    checkersOnLine.Add(checkers.Where(checker => checker.Data.position.x == x && checker.Data.position.y == z).First());
+                    checkersOnLine.Add(allCheckers.Where(checker => checker.Data.position.x == x && checker.Data.position.y == z).First());
                 }
                 z += deltaZ;
             }
             Checker checker = checkersOnLine
-                        .Where(checker => checker.transform.position == new Vector3(mouseDownPosition.x, 0, mouseDownPosition.y))
+                        .Where(checker => checker.Data.position == new Vector2Int(mouseDownPosition.x, mouseDownPosition.y))
                         .FirstOrDefault();
             if (checker != null)
             {
@@ -94,7 +103,7 @@ public class Board : MonoBehaviour
             if (!selectedChecker.Data.isKing)
             {
                 int colourMult = selectedChecker.Data.isWhite ? 1 : -1;
-                if (vector2Int.y == colourMult)
+                if (vector2Int.y == colourMult && beatCheckers.Count == 0)
                 {
                     return true;
                 }
@@ -111,14 +120,7 @@ public class Board : MonoBehaviour
                         {
                             selectedChecker.MakeKing();
                         }
-                        if (enemy.Data.isWhite == true)
-                        {
-                            whiteCheckers--;
-                        }
-                        else
-                        {
-                            blackCheckers--;
-                        }
+                        allCheckers.Remove(enemy);
                         Destroy(enemy.gameObject);
                         return true;
                     }
@@ -129,20 +131,13 @@ public class Board : MonoBehaviour
                 if (checkersOnLine.Where(checker => checker.Data.isWhite == selectedChecker.Data.isWhite).ToArray().Length == 0)
                 {
                     Checker[] enemies = checkersOnLine.Where(checker => checker.Data.isWhite != selectedChecker.Data.isWhite).ToArray();
-                    if (enemies.Length == 0)
+                    if (enemies.Length == 0 && beatCheckers.Count == 0)
                     {
                         return true;
                     }
                     if (enemies.Length == 1)
                     {
-                        if (enemies[0].Data.isWhite == true)
-                        {
-                            whiteCheckers--;
-                        }
-                        else
-                        {
-                            blackCheckers--;
-                        }
+                        allCheckers.Remove(enemies[0]);
                         Destroy(enemies[0].gameObject);
                         return true;
                     }
@@ -155,20 +150,17 @@ public class Board : MonoBehaviour
     {
         GameObject checkerPrefab = data.isWhite ? WhitePrefab : BlackPrefab;
         var figureGameObject = Instantiate(checkerPrefab, new Vector3(data.position.x, 0, data.position.y), checkerPrefab.transform.rotation);
+        if (data.isKing)
+        {
+            figureGameObject.GetComponent<Checker>().MakeKing();
+        }
         figureGameObject.GetComponent<Checker>().Data = data;
-        if (data.isWhite)
-        {
-            whiteCheckers++;
-        }
-        else
-        {
-            blackCheckers++;
-        }
+        allCheckers.Add(figureGameObject.GetComponent<Checker>());
     }
     public void SaveBoard()
     {
         BoardState boardState;
-        boardState.checkersData = FindObjectsOfType<Checker>().Select(checker => checker.Data).ToArray();
+        boardState.checkersData = allCheckers.Select(checker => checker.Data).ToArray();
         boardState.isWhiteTurn = isWhiteTurn;
         string path = Path.Combine(Application.dataPath, "previousGame.json");
         using (StreamWriter streamWriter = new StreamWriter(path))
@@ -179,12 +171,11 @@ public class Board : MonoBehaviour
     }
     public void GenerateBoard(bool isNewGame = false)
     {
-        List<GameObject> checkers = FindObjectsOfType<Checker>().Select(x => x.transform.gameObject).ToList();
-        foreach(GameObject checker in checkers)
+        foreach (var checker in allCheckers.Where(checker => checker != null))
         {
-            Destroy(checker);
+            Destroy(checker.gameObject);
         }
-        whiteCheckers = blackCheckers = 0;
+        allCheckers = new List<Checker>();
         string path = isNewGame ? "newGame.json" : "previousGame.json";
         string fullPath = Path.Combine(Application.dataPath, path);
         using (StreamReader reader = new StreamReader(fullPath))
@@ -195,17 +186,74 @@ public class Board : MonoBehaviour
             for (int i = 0; i < boardState.checkersData.Length; i++)
                 AddChecker(boardState.checkersData[i]);
         }
+        beatCheckers = BeatMoves();
     }
-    private void WinCheck()
+    private List<Checker> BeatMoves(Checker checkerB = null)
     {
-        if (blackCheckers == 0)
+        List<Checker> beatCheckers = new List<Checker>();
+        List<Checker> checkers;
+        Vector2Int[] steps = new Vector2Int[]{
+            new Vector2Int(1,1),
+            new Vector2Int(1,-1),
+            new Vector2Int(-1,-1),
+            new Vector2Int(-1,1)
+        };
+        Vector2 max = new Vector2(7, 7);
+        if (checkerB == null)
         {
-            Debug.Log("White WIN");
+            checkers = allCheckers;
         }
-        if (whiteCheckers == 0)
+        else
+            checkers = new List<Checker>() { checkerB };
+        foreach (Checker checker in allCheckers.Where(checker => checker.Data.isWhite == isWhiteTurn))
         {
-            Debug.Log("Black WIN");
+            if (checker.Data.isKing)
+            {
+                bool isFound = false;
+                foreach (Vector2Int step in steps)
+                {
+                    if (!isFound)
+                    {
+                        int counter = 1;
+                        //while (0 <= (checker.Data.position + step * (counter + 1)).magnitude && (checker.Data.position + step * (counter + 1)).magnitude <= max.magnitude)
+                        while (((checker.Data.position + step * (counter + 1)).x >= 0 && (checker.Data.position + step * (counter + 1)).x <= 7)
+                            && ((checker.Data.position + step * (counter + 1)).y >= 0 && (checker.Data.position + step * (counter + 1)).y <= 7))
+                        {
+                            if (allCheckers.Where(check => check.Data.position == (checker.Data.position + step * counter) && check.Data.isWhite != checker.Data.isWhite).FirstOrDefault() != null)
+                            {
+                                if (allCheckers.Where(check => check.Data.position == (checker.Data.position + (step * (counter + 1)))).FirstOrDefault() == null)
+                                {
+                                    beatCheckers.Add(checker);
+                                    isFound = true;
+                                    break;
+                                }
+                                else
+                                    break;
+                            }
+                            counter++;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (Vector2Int step in steps)
+                {
+                    //if (0 <= (checker.Data.position + step * 2).magnitude && (checker.Data.position + step * 2).magnitude <= max.magnitude)
+                    if (((checker.Data.position + step * 2).x >= 0 && (checker.Data.position + step * 2).x <= 7)
+                            && ((checker.Data.position + step * 2).y >= 0 && (checker.Data.position + step * 2).y <= 7))
+                    {
+                        if (allCheckers.Where(check => check.Data.position == (checker.Data.position + step) && check.Data.isWhite != checker.Data.isWhite).Count() != 0
+                            && allCheckers.Where(check => check.Data.position == (checker.Data.position + step * 2)).Count() == 0)
+                        {
+                            beatCheckers.Add(checker);
+                            break;
+                        }
+                    }
+                }
+            }
         }
+        return beatCheckers;
     }
 }
 
