@@ -7,21 +7,26 @@ using System;
 
 public class Board : MonoBehaviour
 {
+    [SerializeField] UIManager UIManager;
     [SerializeField] GameObject WhitePrefab;
     [SerializeField] GameObject BlackPrefab;
     List<Checker> allCheckers = new List<Checker>();
     List<Checker> beatCheckers = new List<Checker>();
-    private Checker selectedChecker;
+    private Checker selectedChecker; 
     private bool isWhiteTurn;
     private bool wasBeat;
     private int onlyKingTurns;
+    public bool isRunning;
     void Start()
     {
         transform.position = new Vector3(3.5f, -0.14f, 3.5f);
     }
     void Update()
     {
-        Turn();
+        if (isRunning)
+        {
+            Turn();
+        }
     }
     private void Turn()
     {
@@ -225,7 +230,7 @@ public class Board : MonoBehaviour
             streamWriter.Write(json);
         }
     }
-    public void GenerateBoard(bool isNewGame = false)
+    public void GenerateBoard(bool isNewGame)
     {
         foreach (var checker in allCheckers.Where(checker => checker != null))
             Destroy(checker.gameObject);
@@ -255,11 +260,11 @@ public class Board : MonoBehaviour
     private void WinAndDrawCheck()
     {
         if (allCheckers.Where(checker => checker.Data.isWhite).Count() == 0)
-            Debug.Log("Black WINS!!!");
+            UIManager.EndGame("Black WINS!!!");
         if (allCheckers.Where(checker => !checker.Data.isWhite).Count() == 0)
-            Debug.Log("White WINS!!!");
+            UIManager.EndGame("White WINS!!!");
         if (onlyKingTurns == 15)
-            Debug.Log("DRAW");
+            UIManager.EndGame("DRAW");
     }
 }
 [Serializable]
