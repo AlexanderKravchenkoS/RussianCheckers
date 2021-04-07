@@ -73,6 +73,7 @@ public class Board : MonoBehaviour
                     }
                     if (beatCheckers.Count == 0)
                     {
+                        wasBeat = false;
                         selectedChecker = null;
                         isWhiteTurn = !isWhiteTurn;
                         beatCheckers = new List<Checker>();
@@ -169,7 +170,7 @@ public class Board : MonoBehaviour
             checkers = allCheckers;
         else
             checkers = new List<Checker>() { checkerForOneMoreTurn };
-        foreach (Checker checker in allCheckers.Where(checker => checker.Data.isWhite == isWhiteTurn))
+        foreach (Checker checker in checkers.Where(checker => checker.Data.isWhite == isWhiteTurn))
         {
             if (checker.Data.isKing)
             {
