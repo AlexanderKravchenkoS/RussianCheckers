@@ -10,6 +10,7 @@ public class Board : MonoBehaviour
     [SerializeField] UIManager UIManager;
     [SerializeField] GameObject WhitePrefab;
     [SerializeField] GameObject BlackPrefab;
+    [SerializeField] GameObject Highlighter;
     List<Checker> allCheckers = new List<Checker>();
     List<Checker> beatCheckers = new List<Checker>();
     private Checker selectedChecker; 
@@ -35,28 +36,23 @@ public class Board : MonoBehaviour
         if (Physics.Raycast(ray, out hit, LayerMask.GetMask("Board")))
         {
             Vector2Int mouseDownPosition = new Vector2Int((int)(hit.point.x + 0.5), (int)(hit.point.z + 0.5));
+            Highlighter.SetActive(true);
+            Highlighter.transform.position = new Vector3(mouseDownPosition.x, -0.12f, mouseDownPosition.y);
             if (Input.GetMouseButtonDown(0))
             {
                 var checker = hit.transform.gameObject.GetComponent<Checker>();
-                if (checker != null && checker.Data.isWhite == isWhiteTurn && beatCheckers.Count == 0) 
+                if (checker != null && checker.Data.isWhite == isWhiteTurn && beatCheckers.Count == 0)
                     selectedChecker = checker;
                 else if (checker != null && checker.Data.isWhite == isWhiteTurn && beatCheckers.Contains(checker))
                     selectedChecker = checker;
             }
             if (selectedChecker != null)
             {
-                Vector3 vector3 = new Vector3(hit.point.x, 0, hit.point.z);
-                selectedChecker.transform.position = vector3 + Vector3.up;
+                selectedChecker.transform.position = new Vector3(hit.point.x, 1, hit.point.z);
                 if (Input.GetMouseButtonUp(0))
                 {
                     Vector2Int originPosition = selectedChecker.Data.position;
-                    if (mouseDownPosition.x < 0 || mouseDownPosition.x > 7 || mouseDownPosition.y < 0 || mouseDownPosition.y > 7)
-                    {
-                        selectedChecker.transform.position = new Vector3(originPosition.x, 0, originPosition.y);
-                        selectedChecker = null;
-                        return;
-                    }
-                    if (originPosition == mouseDownPosition || !IsCorrectMove(mouseDownPosition))
+                    if (mouseDownPosition.x < 0 || mouseDownPosition.x > 7 || mouseDownPosition.y < 0 || mouseDownPosition.y > 7 || originPosition == mouseDownPosition || !IsCorrectMove(mouseDownPosition))
                     {
                         selectedChecker.transform.position = new Vector3(originPosition.x, 0, originPosition.y);
                         selectedChecker = null;
@@ -83,6 +79,8 @@ public class Board : MonoBehaviour
                 }
             }
         }
+        else
+            Highlighter.SetActive(false);
     }
     private bool IsCorrectMove(Vector2Int mouseDownPosition)
     {
@@ -116,8 +114,7 @@ public class Board : MonoBehaviour
                 {
                     Vector2Int enemyPos = (mouseDownPosition + selectedChecker.Data.position) / 2;
                     Checker enemy = checkersOnLine
-                        .Where(checker => 
-                            checker.transform.position == new Vector3(enemyPos.x, 0, enemyPos.y) && checker.Data.isWhite != selectedChecker.Data.isWhite)
+                        .Where(checker => checker.transform.position == new Vector3(enemyPos.x, 0, enemyPos.y) && checker.Data.isWhite != selectedChecker.Data.isWhite)
                         .FirstOrDefault();
                     if (enemy != null)
                     {
@@ -133,16 +130,16 @@ public class Board : MonoBehaviour
             }
             else
             {
-                if (checkersOnLine.Where(checker => checker.Data.isWhite == selectedChecker.Data.isWhite).ToArray().Length == 0)
+                if (checkersOnLine.Where(checker => checker.Data.isWhite == selectedChecker.Data.isWhite).ToList().Count == 0)
                 {
-                    Checker[] enemies = checkersOnLine.Where(checker => checker.Data.isWhite != selectedChecker.Data.isWhite).ToArray();
-                    if (enemies.Length == 0 && beatCheckers.Count == 0)
+                    List<Checker> enemies = checkersOnLine.Where(checker => checker.Data.isWhite != selectedChecker.Data.isWhite).ToList();
+                    if (enemies.Count == 0 && beatCheckers.Count == 0)
                     {
                         onlyKingTurns++;
                         wasBeat = false;
                         return true;
                     }
-                    if (enemies.Length == 1)
+                    if (enemies.Count == 1)
                     {
                         onlyKingTurns = 0;
                         wasBeat = true;

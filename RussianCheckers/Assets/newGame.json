@@ -194,5 +194,6 @@
       "isKing": false
     }
   ],
-  "isWhiteTurn":  true
+  "isWhiteTurn": true,
+  "onlyKingTurns": 0
 }
