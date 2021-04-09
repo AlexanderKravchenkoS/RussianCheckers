@@ -18,13 +18,11 @@ public class UIManager : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             if (Board.isRunning == true)
             {
                 Board.isRunning = false;
                 pauseMenu.gameObject.SetActive(true);
             }
-        }
     }
     public void Resume()
     {

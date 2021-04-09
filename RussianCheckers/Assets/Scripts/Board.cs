@@ -25,9 +25,7 @@ public class Board : MonoBehaviour
     void Update()
     {
         if (isRunning)
-        {
             Turn();
-        }
     }
     private void Turn()
     {
@@ -201,7 +199,7 @@ public class Board : MonoBehaviour
                 foreach (Vector2Int step in steps)
                 {
                     if (((checker.Data.position + step * 2).x >= 0 && (checker.Data.position + step * 2).x <= 7)
-                            && ((checker.Data.position + step * 2).y >= 0 && (checker.Data.position + step * 2).y <= 7))
+                        && ((checker.Data.position + step * 2).y >= 0 && (checker.Data.position + step * 2).y <= 7))
                     {
                         if (allCheckers.Where(check => check.Data.position == (checker.Data.position + step) && check.Data.isWhite != checker.Data.isWhite).Count() != 0
                             && allCheckers.Where(check => check.Data.position == (checker.Data.position + step * 2)).Count() == 0)

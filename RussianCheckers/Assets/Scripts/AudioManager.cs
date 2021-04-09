@@ -15,8 +15,6 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         if (!audioSource.isPlaying)
-        {
             audioSource.PlayOneShot(audioClips[Random.Range(0, audioClips.Length)]);
-        }
     }
 }
